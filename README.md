@@ -6,11 +6,11 @@
 
 [![API 数量](https://img.shields.io/badge/API%20数量-400+-blue)][api.json]
 [![LICENSE](https://img.shields.io/badge/LICENSE-GPLv3+-red)][LICENSE]
-[![Python](https://img.shields.io/badge/python-3.10+-blue)](https://www.python.org)
+[![Python](https://img.shields.io/badge/python-3.12+-blue)](https://www.python.org)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 [![Stable Version](https://img.shields.io/pypi/v/bilibili-api-python?label=stable)][pypi]
 [![Pre-release Version](https://img.shields.io/github/v/release/Nemo2011/bilibili-api?label=pre-release&include_prereleases&sort=semver)][pypi-dev]
 [![STARS](https://img.shields.io/github/stars/nemo2011/bilibili-api?color=yellow&label=Github%20Stars)][stargazers]
-[![Testing](https://github.com/Nemo2011/bilibili-api/actions/workflows/testing.yml/badge.svg?branch=dev)](https://github.com/Nemo2011/bilibili-api/actions/workflows/testing.yml)
 
 **:warning: 接口可能改动，请及时更新最新版 [![Stable Version](https://img.shields.io/pypi/v/bilibili-api-python?label=stable)][pypi]**
 
@@ -47,28 +47,31 @@ Github 仓库：[https://github.com/nemo2011/bilibili-api](https://github.com/ne
 
 首先使用以下指令安装本模块：
 
-```
-# 主版本
+```bash
+# pip
 $ pip3 install bilibili-api-python
 
+# uv
+$ uv add bilibili-api-python
+
 # 开发版本
-$ pip3 install bilibili-api-dev
+$ uv add bilibili-api-dev
 
 # 最新修改会在 dev 分支
-$ pip3 install git+https://github.com/Nemo2011/bilibili-api.git@dev
+$ uv add "git+https://github.com/Nemo2011/bilibili-api.git@dev"
 ```
 
 然后需要**自行安装**一个支持异步的第三方请求库，如 `aiohttp` / `httpx` / `curl_cffi`。
 
-```
+```bash
 # aiohttp
-$ pip3 install aiohttp
+$ uv add aiohttp
 
 # httpx
-$ pip3 install httpx
+$ uv add httpx
 
 # curl_cffi
-$ pip3 install "curl_cffi"
+$ uv add curl_cffi
 ```
 
 接下来我们来获取视频的播放量等信息：
@@ -217,8 +220,23 @@ A: 你可以发 Issue 来提交你的需求，但是，最好的办法是自己�
 <span id="contribute">**Q: 我有一个大胆的想法，如何给代码库贡献？**</span>
 
 A: 请先 clone 本仓库一份，然后从 main 分支新建一个分支，在该分支上工作。
-如果你觉得已经可以了，请向项目仓库的 develop 分支发起 Pull request。
-如果你不明白这些操作的话，可以百度。完整指南：[CONTRIBUTING.md](https://github.com/nemo2011/bilibili-api/blob/main/.github/CONTRIBUTING.md)
+如果你觉得已经可以了，请向项目仓库的 dev 分支发起 Pull request。
+
+本仓库使用 [uv](https://github.com/astral-sh/uv) 管理开发环境，初始化与常用指令：
+
+```bash
+# 安装 uv（参见官方文档），然后同步依赖（含开发依赖）
+$ uv sync
+
+# 运行 lint
+$ uv run python scripts/lint.py
+
+# 运行全部测试
+$ uv run python -m tests.main -a
+
+# 运行单个测试模块
+$ uv run python -m tests.main -m initial_state
+```
 
 **Q: 稳定性怎么样？**
 

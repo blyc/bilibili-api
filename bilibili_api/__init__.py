@@ -6,6 +6,8 @@ bilibili_api
  (默认已导入所有子模块，例如 `bilibili_api.video`, `bilibili_api.user`)
 """
 
+from importlib.metadata import PackageNotFoundError, version as _get_version
+
 from .utils.sync import sync
 from .utils.picture import Picture
 from .utils.short import get_real_url
@@ -116,7 +118,10 @@ from . import (
 )
 
 
-BILIBILI_API_VERSION = "17.4.2"
+try:
+    BILIBILI_API_VERSION = _get_version("bilibili-api-python")
+except PackageNotFoundError:
+    BILIBILI_API_VERSION = "0.0.0"
 
 
 def __register_all_clients():
