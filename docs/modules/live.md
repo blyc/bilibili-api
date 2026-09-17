@@ -96,6 +96,7 @@ Logger: LiveDanmaku().logger
 Events:
 + DANMU_MSG: 用户发送弹幕
 + SEND_GIFT: 礼物
++ SEND_GIFT_V2: 礼物V2 (*)
 + COMBO_SEND: 礼物连击
 + GUARD_BUY: 续费大航海
 + SUPER_CHAT_MESSAGE: 醒目留言(SC)
@@ -173,7 +174,9 @@ Events:
 + ==========================
 + VIEW: 直播间人气更新
 + ALL: 所有事件
-+ DISCONNECT: 断开连接（传入连接状态码参数）
++ DISCONNECT: 连接已关闭（用户主动断开，data 含 code/reason）
++ RECONNECT: 非正常断开，即将重连（data 含 reason）
++ CONNECT_FAILED: 无法连接服务器，放弃重试（data 含 reason）
 + TIMEOUT: 心跳响应超时
 + VERIFICATION_SUCCESSFUL: 认证成功
 

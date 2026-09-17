@@ -106,7 +106,7 @@ wheels = [
 
 [[package]]
 name = "bilibili-api-python"
-version = "17.4.2"
+version = "17.4.3"
 source = { editable = "." }
 dependencies = [
     { name = "apscheduler" },
@@ -148,7 +148,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "curl-cffi", specifier = ">=0.8.1b9" },
+    { name = "curl-cffi", specifier = ">=0.16" },
     { name = "mypy" },
     { name = "pylint" },
 ]

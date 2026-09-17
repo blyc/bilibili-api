@@ -896,347 +896,499 @@ class LiveRoom:
 
 def parse_user_info(bt6: bytes) -> dict:
     def parse_base(bt7: bytes) -> dict:
-        ret7 = {}
+        ret7: dict = {}
         br7 = BytesReader(stream=bt7)
         while not br7.has_end():
-            type7 = br7.varint() >> 3
-            if type7 == 1:
+            field7, wire7 = br7.read_tag()
+            if field7 == 1 and wire7 == 2:
                 ret7["name"] = br7.string()
-            elif type7 == 2:
+            elif field7 == 2 and wire7 == 2:
                 ret7["face"] = br7.string()
-            elif type7 == 3:
+            elif field7 == 3 and wire7 == 0:
                 ret7["name_color"] = br7.varint()
-            elif type7 == 4:
+            elif field7 == 4 and wire7 == 0:
                 ret7["is_mystery"] = br7.bool()
-            elif type7 == 5:
+            elif field7 == 5 and wire7 == 2:
                 ret7["risk_ctrl_info"] = {}
-                br114514 = BytesReader(stream=br7.bytes_string())
-                while not br114514.has_end():
-                    if (br114514.varint() >> 3) == 1:
-                        ret7["risk_ctrl_info"]["name"] = br114514.string()
-                    elif (br114514.varint() >> 3) == 2:
-                        ret7["risk_ctrl_info"]["face"] = br114514.string()
-            elif type7 == 6:
+                br = BytesReader(stream=br7.bytes_string())
+                while not br.has_end():
+                    field, wire = br.read_tag()
+                    if field == 1 and wire == 2:
+                        ret7["risk_ctrl_info"]["name"] = br.string()
+                    elif field == 2 and wire == 2:
+                        ret7["risk_ctrl_info"]["face"] = br.string()
+                    else:
+                        br.skip_field(wire)
+            elif field7 == 6 and wire7 == 2:
                 ret7["account_info"] = {}
-                br114514 = BytesReader(stream=br7.bytes_string())
-                while not br114514.has_end():
-                    if (br114514.varint() >> 3) == 1:
-                        ret7["account_info"]["name"] = br114514.string()
-                    elif (br114514.varint() >> 3) == 2:
-                        ret7["account_info"]["face"] = br114514.string()
-            elif type7 == 7:
+                br = BytesReader(stream=br7.bytes_string())
+                while not br.has_end():
+                    field, wire = br.read_tag()
+                    if field == 1 and wire == 2:
+                        ret7["account_info"]["name"] = br.string()
+                    elif field == 2 and wire == 2:
+                        ret7["account_info"]["face"] = br.string()
+                    else:
+                        br.skip_field(wire)
+            elif field7 == 7 and wire7 == 2:
                 ret7["official_info"] = {}
-                br114514 = BytesReader(stream=br7.bytes_string())
-                while not br114514.has_end():
-                    if (br114514.varint() >> 3) == 1:
-                        ret7["official_info"]["role"] = br114514.varint()
-                    elif (br114514.varint() >> 3) == 2:
-                        ret7["official_info"]["title"] = br114514.string()
-                    elif (br114514.varint() >> 3) == 2:
-                        ret7["official_info"]["desc"] = br114514.string()
-                    elif (br114514.varint() >> 3) == 2:
-                        ret7["official_info"]["type"] = br114514.varint()
-            elif type7 == 8:
+                br = BytesReader(stream=br7.bytes_string())
+                while not br.has_end():
+                    field, wire = br.read_tag()
+                    if field == 1 and wire == 0:
+                        ret7["official_info"]["role"] = br.varint()
+                    elif field == 2 and wire == 2:
+                        ret7["official_info"]["title"] = br.string()
+                    elif field == 3 and wire == 2:
+                        ret7["official_info"]["desc"] = br.string()
+                    elif field == 4 and wire == 0:
+                        ret7["official_info"]["type"] = br.varint()
+                    else:
+                        br.skip_field(wire)
+            elif field7 == 8 and wire7 == 2:
                 ret7["name_color_str"] = br7.string()
+            else:
+                br7.skip_field(wire7)
         return ret7
 
     def parse_level(bt7: bytes) -> dict:
-        ret7 = {}
+        ret7: dict = {}
         br7 = BytesReader(stream=bt7)
         while not br7.has_end():
-            type7 = br7.varint() >> 3
-            if type7 == 1:
+            field7, wire7 = br7.read_tag()
+            if field7 == 1 and wire7 == 2:
                 ret7["name"] = br7.string()
-            elif type7 == 2:
+            elif field7 == 2 and wire7 == 0:
                 ret7["level"] = br7.varint()
-            elif type7 == 3:
+            elif field7 == 3 and wire7 == 0:
                 ret7["color_start"] = br7.varint()
-            elif type7 == 4:
+            elif field7 == 4 and wire7 == 0:
                 ret7["color_end"] = br7.varint()
-            elif type7 == 5:
+            elif field7 == 5 and wire7 == 0:
                 ret7["color_border"] = br7.varint()
-            elif type7 == 6:
+            elif field7 == 6 and wire7 == 0:
                 ret7["color"] = br7.varint()
-            elif type7 == 7:
+            elif field7 == 7 and wire7 == 0:
                 ret7["id"] = br7.varint()
-            elif type7 == 8:
+            elif field7 == 8 and wire7 == 0:
                 ret7["have_medal_type"] = br7.varint()
-            elif type7 == 9:
+            elif field7 == 9 and wire7 == 0:
                 ret7["is_light"] = br7.varint()
-            elif type7 == 10:
+            elif field7 == 10 and wire7 == 0:
                 ret7["ruid"] = br7.varint()
-            elif type7 == 11:
+            elif field7 == 11 and wire7 == 0:
                 ret7["guard_level"] = br7.varint()
-            elif type7 == 12:
+            elif field7 == 12 and wire7 == 0:
                 ret7["score"] = br7.varint()
-            elif type7 == 13:
+            elif field7 == 13 and wire7 == 2:
                 ret7["guard_icon"] = br7.string()
-            elif type7 == 14:
+            elif field7 == 14 and wire7 == 2:
                 ret7["honor_icon"] = br7.string()
-            elif type7 == 15:
+            elif field7 == 15 and wire7 == 2:
                 ret7["v2_medal_color_start"] = br7.string()
-            elif type7 == 16:
+            elif field7 == 16 and wire7 == 2:
                 ret7["v2_medal_color_end"] = br7.string()
-            elif type7 == 17:
+            elif field7 == 17 and wire7 == 2:
                 ret7["v2_medal_color_border"] = br7.string()
-            elif type7 == 18:
+            elif field7 == 18 and wire7 == 2:
                 ret7["v2_medal_color_text"] = br7.string()
-            elif type7 == 19:
+            elif field7 == 19 and wire7 == 2:
                 ret7["v2_medal_color_level"] = br7.string()
-            elif type7 == 20:
+            elif field7 == 20 and wire7 == 0:
                 ret7["user_receive_count"] = br7.varint()
+            else:
+                br7.skip_field(wire7)
         return ret7
 
     def parse_wealth(bt7: bytes) -> dict:
-        ret7 = {}
+        ret7: dict = {}
         br7 = BytesReader(stream=bt7)
         while not br7.has_end():
-            type7 = br7.varint() >> 3
-            if type7 == 1:
+            field7, wire7 = br7.read_tag()
+            if field7 == 1 and wire7 == 0:
                 ret7["level"] = br7.varint()
-            elif type7 == 2:
+            elif field7 == 2 and wire7 == 2:
                 ret7["dm_icon_key"] = br7.string()
+            else:
+                br7.skip_field(wire7)
         return ret7
 
     def parse_title(bt7: bytes) -> dict:
-        ret7 = {}
+        ret7: dict = {}
         br7 = BytesReader(stream=bt7)
         while not br7.has_end():
-            type7 = br7.varint() >> 3
-            if type7 == 1:
+            field7, wire7 = br7.read_tag()
+            if field7 == 1 and wire7 == 2:
                 ret7["old_title_css_id"] = br7.string()
-            elif type7 == 2:
+            elif field7 == 2 and wire7 == 2:
                 ret7["title_css_id"] = br7.string()
+            else:
+                br7.skip_field(wire7)
         return ret7
 
     def parse_guard(bt7: bytes) -> dict:
-        ret7 = {}
+        ret7: dict = {}
         br7 = BytesReader(stream=bt7)
         while not br7.has_end():
-            type7 = br7.varint() >> 3
-            if type7 == 1:
+            field7, wire7 = br7.read_tag()
+            if field7 == 1 and wire7 == 0:
                 ret7["level"] = br7.varint()
-            elif type7 == 2:
+            elif field7 == 2 and wire7 == 2:
                 ret7["expired_str"] = br7.string()
+            else:
+                br7.skip_field(wire7)
         return ret7
 
     def parse_user_head_frame(bt7: bytes) -> dict:
-        ret7 = {}
+        ret7: dict = {}
         br7 = BytesReader(stream=bt7)
         while not br7.has_end():
-            type7 = br7.varint() >> 3
-            if type7 == 1:
+            field7, wire7 = br7.read_tag()
+            if field7 == 1 and wire7 == 0:
                 ret7["id"] = br7.varint()
-            elif type7 == 2:
+            elif field7 == 2 and wire7 == 2:
                 ret7["frame_img"] = br7.string()
+            else:
+                br7.skip_field(wire7)
         return ret7
 
     def parse_guard_leader(bt7: bytes) -> dict:
-        ret7 = {}
+        ret7: dict = {}
         br7 = BytesReader(stream=bt7)
         while not br7.has_end():
-            type7 = br7.varint() >> 3
-            if type7 == 1:
+            field7, wire7 = br7.read_tag()
+            if field7 == 1 and wire7 == 0:
                 ret7["is_guard_leader"] = br7.bool()
+            else:
+                br7.skip_field(wire7)
         return ret7
 
-    ret6 = {}
+    ret6: dict = {}
     br6 = BytesReader(stream=bt6)
     while not br6.has_end():
-        type6 = br6.varint() >> 3
-        if type6 == 1:
+        field6, wire6 = br6.read_tag()
+        if field6 == 1 and wire6 == 0:
             ret6["uid"] = br6.varint()
-        elif type6 == 2:
+        elif field6 == 2 and wire6 == 2:
             ret6["base"] = parse_base(br6.bytes_string())
-        elif type6 == 3:
+        elif field6 == 3 and wire6 == 2:
             ret6["medal"] = parse_level(br6.bytes_string())
-        elif type6 == 4:
+        elif field6 == 4 and wire6 == 2:
             ret6["wealth"] = parse_wealth(br6.bytes_string())
-        elif type6 == 5:
+        elif field6 == 5 and wire6 == 2:
             ret6["title"] = parse_title(br6.bytes_string())
-        elif type6 == 6:
+        elif field6 == 6 and wire6 == 2:
             ret6["guard"] = parse_guard(br6.bytes_string())
-        elif type6 == 7:
+        elif field6 == 7 and wire6 == 2:
             ret6["user_head_frame"] = parse_user_head_frame(br6.bytes_string())
-        elif type6 == 8:
+        elif field6 == 8 and wire6 == 2:
             ret6["parse_guard_leader"] = parse_guard_leader(br6.bytes_string())
+        else:
+            br6.skip_field(wire6)
     return ret6
 
 
 def parse_interact_word_v2(bt: bytes) -> dict:
     def parse_fans_medal_info(bt2: bytes) -> dict:
-        ret2 = {}
+        ret2: dict = {}
         br2 = BytesReader(stream=bt2)
         while not br2.has_end():
-            type2 = br2.varint() >> 3
-            if type2 == 1:
+            field2, wire2 = br2.read_tag()
+            if field2 == 1 and wire2 == 0:
                 ret2["target_id"] = br2.varint()
-            elif type2 == 2:
+            elif field2 == 2 and wire2 == 0:
                 ret2["medal_level"] = br2.varint()
-            elif type2 == 3:
+            elif field2 == 3 and wire2 == 2:
                 ret2["medal_name"] = br2.string()
-            elif type2 == 4:
+            elif field2 == 4 and wire2 == 0:
                 ret2["medal_color"] = br2.varint()
-            elif type2 == 5:
+            elif field2 == 5 and wire2 == 0:
                 ret2["medal_color_start"] = br2.varint()
-            elif type2 == 6:
+            elif field2 == 6 and wire2 == 0:
                 ret2["medal_color_end"] = br2.varint()
-            elif type2 == 7:
+            elif field2 == 7 and wire2 == 0:
                 ret2["medal_color_border"] = br2.varint()
-            elif type2 == 8:
+            elif field2 == 8 and wire2 == 0:
                 ret2["is_lighted"] = br2.varint()
-            elif type2 == 9:
+            elif field2 == 9 and wire2 == 0:
                 ret2["guard_level"] = br2.varint()
-            elif type2 == 10:
+            elif field2 == 10 and wire2 == 2:
                 ret2["special"] = br2.string()
-            elif type2 == 11:
+            elif field2 == 11 and wire2 == 0:
                 ret2["icon_id"] = br2.varint()
-            elif type2 == 12:
+            elif field2 == 12 and wire2 == 0:
                 ret2["anchor_roomid"] = br2.varint()
-            elif type2 == 13:
+            elif field2 == 13 and wire2 == 0:
                 ret2["score"] = br2.varint()
+            else:
+                br2.skip_field(wire2)
         return ret2
 
     def parse_contribution_info(bt3: bytes) -> dict:
-        ret3 = {}
+        ret3: dict = {}
         br3 = BytesReader(stream=bt3)
         while not br3.has_end():
-            type3 = br3.varint() >> 3
-            if type3 == 1:
+            field3, wire3 = br3.read_tag()
+            if field3 == 1 and wire3 == 0:
                 ret3["grade"] = br3.varint()
+            else:
+                br3.skip_field(wire3)
         return ret3
 
     def parse_contribution_info_v2(bt4: bytes) -> dict:
-        ret4 = {}
+        ret4: dict = {}
         br4 = BytesReader(stream=bt4)
         while not br4.has_end():
-            type4 = br4.varint() >> 3
-            if type4 == 1:
+            field4, wire4 = br4.read_tag()
+            if field4 == 1 and wire4 == 0:
                 ret4["grade"] = br4.varint()
-            elif type4 == 2:
+            elif field4 == 2 and wire4 == 2:
                 ret4["rank_type"] = br4.string()
-            elif type4 == 3:
+            elif field4 == 3 and wire4 == 2:
                 ret4["text"] = br4.string()
+            else:
+                br4.skip_field(wire4)
         return ret4
 
     def parse_group_medal_brief(bt5: bytes) -> dict:
-        ret5 = {}
+        ret5: dict = {}
         br5 = BytesReader(stream=bt5)
         while not br5.has_end():
-            type5 = br5.varint() >> 3
-            if type5 == 1:
+            field5, wire5 = br5.read_tag()
+            if field5 == 1 and wire5 == 0:
                 ret5["medal_id"] = br5.varint()
-            elif type5 == 2:
+            elif field5 == 2 and wire5 == 2:
                 ret5["name"] = br5.string()
-            elif type5 == 3:
+            elif field5 == 3 and wire5 == 0:
                 ret5["is_lighted"] = br5.varint()
+            else:
+                br5.skip_field(wire5)
         return ret5
 
     def parse_user_anchor_relation(bt8: bytes) -> dict:
-        ret8 = {}
+        ret8: dict = {}
         br8 = BytesReader(stream=bt8)
         while not br8.has_end():
-            type8 = br8.varint() >> 3
-            if type8 == 1:
+            field8, wire8 = br8.read_tag()
+            if field8 == 1 and wire8 == 2:
                 ret8["tail_icon"] = br8.string()
-            elif type8 == 2:
+            elif field8 == 2 and wire8 == 2:
                 ret8["tail_guide_text"] = br8.string()
-            elif type8 == 3:
+            elif field8 == 3 and wire8 == 0:
                 ret8["tail_type"] = br8.varint()
+            else:
+                br8.skip_field(wire8)
         return ret8
 
-    ret = {}
+    ret: dict = {}
     br = BytesReader(stream=bt)
     while not br.has_end():
-        type_ = br.varint() >> 3
-        if type_ == 1:
+        field_, wire_ = br.read_tag()
+        if field_ == 1 and wire_ == 0:
             ret["uid"] = br.varint()
-        elif type_ == 2:
+        elif field_ == 2 and wire_ == 2:
             ret["uname"] = br.string()
-        elif type_ == 3:
+        elif field_ == 3 and wire_ == 2:
             ret["uname_color"] = br.string()
-        elif type_ == 4:
+        elif field_ == 4:
             if not ret.get("identities"):
                 ret["identities"] = []
-            ret["identities"].append(br.varint())
-        elif type_ == 5:
+            if wire_ == 0:
+                ret["identities"].append(br.varint())
+            elif wire_ == 2:
+                packed = BytesReader(stream=br.bytes_string())
+                while not packed.has_end():
+                    ret["identities"].append(packed.varint())
+            else:
+                br.skip_field(wire_)
+        elif field_ == 5 and wire_ == 0:
             ret["msg_type"] = br.varint()
-        elif type_ == 6:
+        elif field_ == 6 and wire_ == 0:
             ret["room_id"] = br.varint()
-        elif type_ == 7:
+        elif field_ == 7 and wire_ == 0:
             ret["timestamp"] = br.varint()
-        elif type_ == 8:
+        elif field_ == 8 and wire_ == 0:
             ret["score"] = br.varint()
-        elif type_ == 9:
+        elif field_ == 9 and wire_ == 2:
             ret["fans_medal_info"] = parse_fans_medal_info(br.bytes_string())
-        elif type_ == 10:
+        elif field_ == 10 and wire_ == 0:
             ret["is_spread"] = br.varint()
-        elif type_ == 11:
+        elif field_ == 11 and wire_ == 2:
             ret["spread_info"] = br.string()
-        elif type_ == 12:
+        elif field_ == 12 and wire_ == 2:
             ret["contribution_info"] = parse_contribution_info(br.bytes_string())
-        elif type_ == 13:
+        elif field_ == 13 and wire_ == 2:
             ret["spread_desc"] = br.string()
-        elif type_ == 14:
+        elif field_ == 14 and wire_ == 0:
             ret["tail_icon"] = br.varint()
-        elif type_ == 15:
+        elif field_ == 15 and wire_ == 0:
             ret["trigger_time"] = br.varint()
-        elif type_ == 16:
+        elif field_ == 16 and wire_ == 0:
             ret["privilege_type"] = br.varint()
-        elif type_ == 17:
+        elif field_ == 17 and wire_ == 0:
             ret["core_user_type"] = br.varint()
-        elif type_ == 18:
+        elif field_ == 18 and wire_ == 2:
             ret["tail_text"] = br.string()
-        elif type_ == 19:
+        elif field_ == 19 and wire_ == 2:
             ret["contribution_info_v2"] = parse_contribution_info_v2(br.bytes_string())
-        elif type_ == 20:
+        elif field_ == 20 and wire_ == 2:
             ret["group_medal_brief"] = parse_group_medal_brief(br.bytes_string())
-        elif type_ == 21:
+        elif field_ == 21 and wire_ == 0:
             ret["is_mystery"] = br.bool()
-        elif type_ == 22:
+        elif field_ == 22 and wire_ == 2:
             ret["user_info"] = parse_user_info(br.bytes_string())
-        elif type_ == 23:
+        elif field_ == 23 and wire_ == 2:
             ret["user_anchor_relation"] = parse_user_anchor_relation(br.bytes_string())
+        else:
+            br.skip_field(wire_)
     return ret
 
 
 def parse_online_rank_v3(bt: bytes) -> dict:
     def parse_gold_rank_broadcast_item(ht: bytes) -> dict:
-        item = {}
+        item: dict = {}
         reader = BytesReader(stream=ht)
         while not reader.has_end():
-            t = reader.varint() >> 3
-            if t == 1:
+            field, wire = reader.read_tag()
+            if field == 1 and wire == 0:
                 item["uid"] = reader.varint()
-            elif t == 2:
+            elif field == 2 and wire == 2:
                 item["face"] = reader.string()
-            elif t == 3:
+            elif field == 3 and wire == 2:
                 item["score"] = reader.string()
-            elif t == 4:
+            elif field == 4 and wire == 2:
                 item["uname"] = reader.string()
-            elif t == 5:
+            elif field == 5 and wire == 0:
                 item["rank"] = reader.varint()
-            elif t == 6:
+            elif field == 6 and wire == 0:
                 item["guard_level"] = reader.varint()
-            elif t == 7:
+            elif field == 7 and wire == 0:
                 item["is_mystery"] = reader.bool()
-            elif t == 8:
+            elif field == 8 and wire == 2:
                 item["user_info"] = parse_user_info(reader.bytes_string())
+            else:
+                reader.skip_field(wire)
         return item
-    ret = {}
+    ret: dict = {}
     br = BytesReader(stream=bt)
     while not br.has_end():
-        type_ = br.varint() >> 3
-        if type_ == 1:
+        field_, wire_ = br.read_tag()
+        if field_ == 1 and wire_ == 0:
             ret["rank_type"] = br.varint()
-        elif type_ == 2:
+        elif field_ == 2 and wire_ == 2:
             if not ret.get("list"):
                 ret["list"] = []
             ret["list"].append(parse_gold_rank_broadcast_item(br.bytes_string()))
-        elif type_ == 3:
+        elif field_ == 3 and wire_ == 2:
             if not ret.get("online_list"):
                 ret["online_list"] = []
             ret["online_list"].append(parse_gold_rank_broadcast_item(br.bytes_string()))
+        else:
+            br.skip_field(wire_)
+    return ret
+
+
+def parse_send_gift_v2(bt: bytes) -> dict:
+    def parse_medal_info(bt1: bytes) -> dict:
+        ret1: dict = {}
+        br1 = BytesReader(stream=bt1)
+        while not br1.has_end():
+            field1, wire1 = br1.read_tag()
+            if field1 == 1 and wire1 == 0:
+                ret1["target_id"] = br1.varint()
+            elif field1 == 4 and wire1 == 0:
+                ret1["anchor_roomid"] = br1.varint()
+            elif field1 == 5 and wire1 == 0:
+                ret1["medal_level"] = br1.varint()
+            elif field1 == 6 and wire1 == 2:
+                ret1["medal_name"] = br1.string()
+            else:
+                br1.skip_field(wire1)
+        return ret1
+
+    def parse_blind_gift(bt2: bytes) -> dict:
+        ret2: dict = {}
+        br2 = BytesReader(stream=bt2)
+        while not br2.has_end():
+            field2, wire2 = br2.read_tag()
+            if field2 == 3 and wire2 == 2:
+                ret2["original_gift_name"] = br2.string()
+            elif field2 == 6 and wire2 == 0:
+                ret2["original_gift_price"] = br2.varint()
+            else:
+                br2.skip_field(wire2)
+        return ret2
+
+    def parse_gift_material_snapshot(bt3: bytes) -> dict:
+        ret3: dict = {}
+        br3 = BytesReader(stream=bt3)
+        while not br3.has_end():
+            field3, wire3 = br3.read_tag()
+            if field3 == 1 and wire3 == 2:
+                ret3["img_basic"] = br3.string()
+            else:
+                br3.skip_field(wire3)
+        return ret3
+
+    def parse_gift_item(bt4: bytes) -> dict:
+        ret4: dict = {}
+        br4 = BytesReader(stream=bt4)
+        while not br4.has_end():
+            field4, wire4 = br4.read_tag()
+            if field4 == 1 and wire4 == 0:
+                ret4["gift_id"] = br4.varint()
+            elif field4 == 2 and wire4 == 2:
+                ret4["gift_name"] = br4.string()
+            elif field4 == 3 and wire4 == 0:
+                ret4["num"] = br4.varint()
+            elif field4 == 4 and wire4 == 0:
+                ret4["gift_type"] = br4.varint()
+            elif field4 == 5 and wire4 == 0:
+                ret4["price"] = br4.varint()
+            elif field4 == 6 and wire4 == 0:
+                ret4["discount_price"] = br4.varint()
+            elif field4 == 7 and wire4 == 0:
+                ret4["total_coin"] = br4.varint()
+            elif field4 == 8 and wire4 == 2:
+                ret4["coin_type"] = br4.string()
+            elif field4 == 9 and wire4 == 2:
+                ret4["tid"] = br4.string()
+            elif field4 == 10 and wire4 == 0:
+                ret4["timestamp"] = br4.varint()
+            elif field4 == 12 and wire4 == 2:
+                ret4["rnd"] = br4.string()
+            elif field4 == 18 and wire4 == 2:
+                ret4["action"] = br4.string()
+            elif field4 == 35 and wire4 == 2:
+                ret4["gift_info"] = parse_gift_material_snapshot(br4.bytes_string())
+            else:
+                br4.skip_field(wire4)
+        return ret4
+
+    ret: dict = {}
+    br = BytesReader(stream=bt)
+    while not br.has_end():
+        field_, wire_ = br.read_tag()
+        if field_ == 1 and wire_ == 0:
+            ret["uid"] = br.varint()
+        elif field_ == 2 and wire_ == 2:
+            ret["uname"] = br.string()
+        elif field_ == 3 and wire_ == 2:
+            ret["face"] = br.string()
+        elif field_ == 5 and wire_ == 0:
+            ret["guard_level"] = br.varint()
+        elif field_ == 8 and wire_ == 2:
+            ret["medal_info"] = parse_medal_info(br.bytes_string())
+        elif field_ == 9 and wire_ == 2:
+            ret["blind_gift"] = parse_blind_gift(br.bytes_string())
+        elif field_ == 10 and wire_ == 2:
+            if not ret.get("gift_list"):
+                ret["gift_list"] = []
+            ret["gift_list"].append(parse_gift_item(br.bytes_string()))
+        elif field_ == 15 and wire_ == 2:
+            ret["user_info"] = parse_user_info(br.bytes_string())
+        else:
+            br.skip_field(wire_)
     return ret
 
 
@@ -1251,6 +1403,7 @@ class LiveDanmaku(AsyncEvent):
     Events:
     + DANMU_MSG: 用户发送弹幕
     + SEND_GIFT: 礼物
+    + SEND_GIFT_V2: 礼物V2 (*)
     + COMBO_SEND: 礼物连击
     + GUARD_BUY: 续费大航海
     + SUPER_CHAT_MESSAGE: 醒目留言(SC)
@@ -1328,7 +1481,9 @@ class LiveDanmaku(AsyncEvent):
     + ==========================
     + VIEW: 直播间人气更新
     + ALL: 所有事件
-    + DISCONNECT: 断开连接（传入连接状态码参数）
+    + DISCONNECT: 连接已关闭（用户主动断开，data 含 code/reason）
+    + RECONNECT: 非正常断开，即将重连（data 含 reason）
+    + CONNECT_FAILED: 无法连接服务器，放弃重试（data 含 reason）
     + TIMEOUT: 心跳响应超时
     + VERIFICATION_SUCCESSFUL: 认证成功
 
@@ -1453,6 +1608,15 @@ class LiveDanmaku(AsyncEvent):
         self.__status = self.STATUS_CLOSED
         await self.__client.ws_close(self.__ws)  # type: ignore
 
+        self.dispatch(
+            "DISCONNECT",
+            {
+                "room_display_id": self.room_display_id,
+                "room_real_id": self.__room_real_id,
+                "code": self.__status,
+                "reason": "连接已关闭",
+            },
+        )
         self.logger.info("连接已关闭")
 
     async def __main(self) -> None:
@@ -1496,6 +1660,14 @@ class LiveDanmaku(AsyncEvent):
             self.__heartbeat_timer_web = 0
             if not available_hosts:
                 self.err_reason = "已尝试所有主机但仍无法连接"
+                self.dispatch(
+                    "CONNECT_FAILED",
+                    {
+                        "room_display_id": self.room_display_id,
+                        "room_real_id": self.__room_real_id,
+                        "reason": self.err_reason,
+                    },
+                )
                 break
 
             if host is None or retry <= 0:
@@ -1543,6 +1715,14 @@ class LiveDanmaku(AsyncEvent):
                 # 正常断开情况下跳出循环
                 if self.__status != self.STATUS_CLOSED or self.err_reason:
                     # 非用户手动调用关闭，触发重连
+                    self.dispatch(
+                        "RECONNECT",
+                        {
+                            "room_display_id": self.room_display_id,
+                            "room_real_id": self.__room_real_id,
+                            "reason": self.err_reason or "非正常关闭连接",
+                        },
+                    )
                     self.logger.warning(
                         "非正常关闭连接" if not self.err_reason else self.err_reason
                     )
@@ -1557,8 +1737,16 @@ class LiveDanmaku(AsyncEvent):
                     await self.__client.ws_close(self.__ws)
 
                 if retry <= 0 or len(available_hosts) == 0:
-                    self.logger.error("无法连接服务器")
                     self.err_reason = "无法连接服务器"
+                    self.dispatch(
+                        "CONNECT_FAILED",
+                        {
+                            "room_display_id": self.room_display_id,
+                            "room_real_id": self.__room_real_id,
+                            "reason": self.err_reason,
+                        },
+                    )
+                    self.logger.error("无法连接服务器")
                     break
 
                 self.logger.warning(f"将在 {self.retry_after} 秒后重新连接...")
@@ -1650,6 +1838,30 @@ class LiveDanmaku(AsyncEvent):
                         pb_decode_status = "success"
                     info["data"]["data"] = {
                         "pb": info["data"]["data"]["pb"],
+                        "pb_decoded": pb_decoded,
+                        "pb_decode_message": pb_decode_status,
+                    }
+                # https://github.com/xfgryujk/blivedm/pull/86
+                if callback_info["type"] == "SEND_GIFT_V2":
+                    inner = info["data"].get("data")
+                    pb = inner.get("pb") if isinstance(inner, dict) else None
+                    if pb is None:
+                        pb = info["data"].get("pb")
+                    pb_decoded = {}
+                    pb_decode_status = ""
+                    if not pb:
+                        pb_decode_status = "error"
+                        self.logger.warning("SEND_GIFT_V2 缺少 pb 数据，无法解析")
+                    else:
+                        try:
+                            pb_decoded = parse_send_gift_v2(base64.b64decode(pb))
+                        except Exception:
+                            pb_decode_status = "error"
+                        else:
+                            pb_decode_status = "success"
+                    info["data"]["data"] = {
+                        "dmscore": inner.get("dmscore", 0) if isinstance(inner, dict) else 0,
+                        "pb": pb,
                         "pb_decoded": pb_decoded,
                         "pb_decode_message": pb_decode_status,
                     }

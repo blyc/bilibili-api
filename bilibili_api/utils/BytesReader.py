@@ -5,6 +5,7 @@ bilibili_api.BytesReader
 """
 
 import struct
+from typing import Tuple
 
 from .varint import read_varint
 
@@ -218,6 +219,45 @@ class BytesReader:
         )
         self.__offset += 8
         return data[0]
+
+    def read_tag(self) -> Tuple[int, int]:
+        """
+        读 protobuf 字段的 tag。
+
+        Returns:
+            Tuple[int, int]，字段编号和 wire type。
+        """
+        tag = self.varint()
+        return tag >> 3, tag & 0b111
+
+    def skip_field(self, wire_type: int) -> None:
+        """
+        按 wire type 跳过当前字段的值。
+
+        Args:
+            wire_type (int): 字段的 wire type。
+        """
+        if wire_type == 0:
+            self.varint()
+        elif wire_type == 1:
+            self.fixed64()
+        elif wire_type == 2:
+            self.bytes_string()
+        elif wire_type == 5:
+            self.fixed32()
+        else:
+            raise Exception(f"不支持的 wire type: {wire_type}")
+
+    def skip(self, length: int) -> None:
+        """
+        跳过指定字节数。
+
+        Args:
+            length (int): 要跳过的字节数。
+        """
+        if self.__offset + length > len(self.__stream):
+            raise Exception("读取位置超过字节流长度")
+        self.__offset += length
 
     def set_pos(self, pos: int) -> None:
         """

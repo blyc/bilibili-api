@@ -6,7 +6,7 @@ build-backend = "uv_build"
 name = "bilibili-api-python"
 authors = [{ name = "blyc"}]
 maintainers = [{ name = "MoyuScript" }, { name = "Nemo2011" }]
-version = "17.4.2"
+version = "17.4.3"
 readme = "README.md"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
@@ -38,7 +38,7 @@ dependencies = [
 dev = [
     "pylint",
     "mypy",
-    "curl_cffi>=0.8.1b9",
+    "curl_cffi>=0.16",
 ]
 
 [tool.uv.build-backend]

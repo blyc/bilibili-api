@@ -85,6 +85,7 @@ ignored_funcs = [
     "login_with_key",
     "parse_online_rank_v3",
     "parse_interact_word_v2",
+    "parse_send_gift_v2",
     "parse_user_info",
 ]
 

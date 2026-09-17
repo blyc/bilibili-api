@@ -18,7 +18,7 @@ from typing import Union, List, Dict
 
 from .utils.utils import get_api, raise_for_statement, to_form_urlencoded
 from .exceptions import LoginError, GeetestException
-from .utils.network import Api, Credential, get_client, get_buvid
+from .utils.network import Api, Credential, get_client, get_buvid, HEADERS
 from .utils.geetest import Geetest, GeetestType
 from .utils.picture import Picture
 
@@ -34,6 +34,32 @@ def encrypt(_hash, key, password) -> str:
     return str(
         base64.b64encode(encryptor.encrypt(bytes(_hash + password, "utf-8"))), "utf-8"
     )
+
+
+def extract_cookies_from_url(url: str) -> dict:
+    """
+    从扫码登录返回的 crossDomain url 中解析 cookie。
+
+    Args:
+        url (str): 扫码成功后返回的 url
+
+    Returns:
+        dict: 解析出的 cookie 字典
+    """
+    cookies: dict = {}
+    if not url or "?" not in url:
+        return cookies
+    for item in url.split("?")[1].split("&"):
+        if "=" not in item:
+            continue
+        key, value = item.split("=", 1)
+        if key == "SESSDATA":
+            cookies["SESSDATA"] = value
+        elif key == "bili_jct":
+            cookies["bili_jct"] = value
+        elif key.upper() == "DEDEUSERID":
+            cookies["DedeUserID"] = value
+    return cookies
 
 
 async def login_with_password(
@@ -488,10 +514,15 @@ class QrCodeLogin:
         if self.__platform == QrCodeLoginChannel.WEB:
             api = API["qrcode"]["web"]["get_events"]
             params = {"qrcode_key": self.__qr_key}
-            events = (
-                await Api(credential=Credential(), **api).update_params(**params).result
+            resp = await get_client().request(
+                method="GET",
+                url=api["url"],
+                params=params,
+                headers=HEADERS,
+                cookies={"buvid3": (await get_buvid())[0]},
             )
-            code = events["code"]
+            events = resp.json().get("data") or {}
+            code = events.get("code")
             if code == 86101:
                 return QrCodeLoginEvents.SCAN
             elif code == 86090:
@@ -499,24 +530,20 @@ class QrCodeLogin:
             elif code == 86038:
                 return QrCodeLoginEvents.TIMEOUT
             else:
-                cred_url = events["url"]
-                ac_time_value = events["refresh_token"]
-                cookies_list = cred_url.split("?")[1].split("&")
-                sessdata = ""
-                bili_jct = ""
-                dedeuserid = ""
-                for cookie in cookies_list:
-                    if cookie[:8] == "SESSDATA":
-                        sessdata = cookie[9:]
-                    if cookie[:8] == "bili_jct":
-                        bili_jct = cookie[9:]
-                    if cookie[:11].upper() == "DEDEUSERID=":
-                        dedeuserid = cookie[11:]
+                # 新格式下 url 不含 cookie，cookie 在 poll 响应的 cookie jar 里
+                cookies = extract_cookies_from_url(events.get("url") or "")
+                for key, value in resp.cookies.items():
+                    cookies.setdefault(key, value)
+                if not cookies.get("bili_jct"):
+                    raise LoginError(
+                        f"扫码登录未获取到 bili_jct。url={events.get('url')!r} "
+                        f"resp_cookies={sorted(resp.cookies)}"
+                    )
                 self.__credential = Credential(
-                    sessdata=sessdata,
-                    bili_jct=bili_jct,
-                    dedeuserid=dedeuserid,
-                    ac_time_value=ac_time_value,
+                    sessdata=cookies.get("SESSDATA", ""),
+                    bili_jct=cookies.get("bili_jct", ""),
+                    dedeuserid=cookies.get("DedeUserID", ""),
+                    ac_time_value=events.get("refresh_token"),
                 )
                 return QrCodeLoginEvents.DONE
         else:

@@ -4,7 +4,6 @@ bilibili_api.clients.curl_cffi
 CurlCFFIClient 实现
 """
 
-from select import select
 from ..utils.network import (
     BiliAPIClient,
     BiliAPIFile,
@@ -262,48 +261,34 @@ class CurlCFFIClient(BiliAPIClient):
         )
         ws = self.__ws[cnt]
         await ws.send_binary(data)
+        # curl_cffi >= 0.16 的 send_binary 仅入队，flush 确保真正写入 socket
+        await ws.flush()
 
     async def ws_recv(self, cnt: int) -> Tuple[bytes, BiliWsMsgType]:
         ws = self.__ws[cnt]
-        chunks = []
-        flags = 0
-        sock_fd = ws.curl.getinfo(curl_cffi.CurlInfo.ACTIVESOCKET)
-        if sock_fd == curl_cffi.aio.CURL_SOCKET_BAD:
-            raise curl_cffi.WebSocketError(
-                "Invalid active socket", curl_cffi.CurlECode.NO_CONNECTION_AVAILABLE
-            )
-        while True:
-            if self.__ws_is_closed[cnt]:
-                return (b"", BiliWsMsgType.CLOSED)
-            if self.__ws_need_close[cnt]:
-                return (b"", BiliWsMsgType.CLOSING)
-            try:
-                loop = self.__session.loop
-                chunk, frame = await loop.run_in_executor(None, ws.curl.ws_recv)
-                flags = frame.flags
-                request_log.dispatch(
-                    "WS_RECV",
-                    "收到 WebSocket 数据",
-                    {"id": cnt, "data": chunk, "flags": flags},
-                )
-                chunks.append(chunk)
-                if frame.bytesleft == 0 and flags & curl_cffi.CurlWsFlag.CONT == 0:
-                    break
-            except curl_cffi.CurlError as e:
-                if e.code == curl_cffi.CurlECode.AGAIN:
-                    _, _, _ = select([sock_fd], [], [], 0.5)
-                elif e.code == curl_cffi.CurlECode.GOT_NOTHING:
-                    return (b"", BiliWsMsgType.CLOSED)
-                else:
-                    raise e
+        if self.__ws_is_closed[cnt]:
+            return (b"", BiliWsMsgType.CLOSED)
+        if self.__ws_need_close[cnt]:
+            return (b"", BiliWsMsgType.CLOSING)
+        try:
+            chunk, flags = await ws.recv()
+        except (curl_cffi.WebSocketClosed, curl_cffi.WebSocketError):
+            self.__ws_is_closed[cnt] = True
+            return (b"", BiliWsMsgType.CLOSED)
+        request_log.dispatch(
+            "WS_RECV",
+            "收到 WebSocket 数据",
+            {"id": cnt, "data": chunk, "flags": flags},
+        )
         if flags & curl_cffi.CurlWsFlag.CLOSE:
             return (b"", BiliWsMsgType.CLOSE)
-        by = b"".join(chunks)
         if flags & curl_cffi.CurlWsFlag.TEXT:
-            return (by, BiliWsMsgType.TEXT)
+            return (chunk, BiliWsMsgType.TEXT)
         if flags & curl_cffi.CurlWsFlag.PING:
-            return (by, BiliWsMsgType.PING)
-        return (by, BiliWsMsgType.BINARY)
+            return (chunk, BiliWsMsgType.PING)
+        if flags & curl_cffi.CurlWsFlag.PONG:
+            return (chunk, BiliWsMsgType.PONG)
+        return (chunk, BiliWsMsgType.BINARY)
 
     async def ws_close(self, cnt: int) -> None:
         if self.__ws_need_close[cnt] or self.__ws_is_closed[cnt]:
@@ -315,7 +300,11 @@ class CurlCFFIClient(BiliAPIClient):
             "关闭 WebSocket 请求",
             {"id": cnt},
         )
-        ws.terminate()  # It's better to terminate than close.
+        try:
+            await ws.flush()
+        except Exception:  # pylint: disable=W0718
+            pass
+        ws.terminate()
         self.__ws_is_closed[cnt] = True
 
     async def close(self) -> None:
