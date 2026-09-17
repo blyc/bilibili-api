@@ -132,18 +132,18 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "apscheduler" },
-    { name = "beautifulsoup4" },
-    { name = "brotli" },
-    { name = "colorama" },
-    { name = "lxml" },
-    { name = "pillow" },
-    { name = "pycryptodomex" },
-    { name = "pyjwt" },
-    { name = "pyyaml" },
-    { name = "qrcode" },
-    { name = "qrcode-terminal" },
-    { name = "yarl" },
+    { name = "apscheduler", specifier = ">=3.10,<4" },
+    { name = "beautifulsoup4", specifier = ">=4.9,<5" },
+    { name = "brotli", specifier = ">=1.1" },
+    { name = "colorama", specifier = ">=0.4.6,<1" },
+    { name = "lxml", specifier = ">=5.0" },
+    { name = "pillow", specifier = ">=10.1" },
+    { name = "pycryptodomex", specifier = ">=3.19" },
+    { name = "pyjwt", specifier = ">=2,<3" },
+    { name = "pyyaml", specifier = ">=6.0.1,<7" },
+    { name = "qrcode", specifier = ">=7.4,<9" },
+    { name = "qrcode-terminal", specifier = ">=0.8" },
+    { name = "yarl", specifier = ">=1.9.2" },
 ]
 
 [package.metadata.requires-dev]

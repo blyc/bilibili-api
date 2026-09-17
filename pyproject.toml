@@ -20,18 +20,18 @@ classifiers = [
 ]
 scripts = { "ivitools" = "bilibili_api.tools.ivitools.__main__:main" }
 dependencies = [
-    "beautifulsoup4",
-    "colorama",
-    "lxml",
-    "pyyaml",
-    "brotli",
-    "qrcode",
-    "APScheduler",
-    "pillow",
-    "yarl",
-    "pycryptodomex",
-    "qrcode_terminal",
-    "PyJWT",
+    "beautifulsoup4>=4.9,<5",
+    "colorama>=0.4.6,<1",
+    "lxml>=5.0",
+    "pyyaml>=6.0.1,<7",
+    "brotli>=1.1",
+    "qrcode>=7.4,<9",
+    "APScheduler>=3.10,<4",
+    "pillow>=10.1",
+    "yarl>=1.9.2",
+    "pycryptodomex>=3.19",
+    "qrcode_terminal>=0.8",
+    "PyJWT>=2,<3",
 ]
 
 [dependency-groups]
