@@ -97,11 +97,11 @@ async def login_with_password(
         "validate": geetest.validate,
         "seccode": geetest.seccode,
     }
-    headers = {
+    headers = HEADERS.copy()
+    headers.update({
         "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
         "Referer": "https://passport.bilibili.com/login",
-    }
+    })
     client = get_client()
     resp = await client.request(
         method="POST",
@@ -301,11 +301,9 @@ async def send_sms(phonenumber: PhoneNumber, geetest: Geetest) -> str:
             "challenge": geetest.challenge,
         }
     )
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-        "Referer": "https://www.bilibili.com",
-        "Content-Type": "application/x-www-form-urlencoded",
-    }
+    headers = HEADERS.copy()
+    headers.update({"Content-Type": "application/x-www-form-urlencoded"})
+
     client = get_client()
     res = await client.request(
         method="POST",
@@ -344,11 +342,10 @@ async def login_with_sms(
         "captcha_key": captcha_id,
         "keep": "true",
     }
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-        "Referer": "https://www.bilibili.com",
+    headers = HEADERS.copy()
+    headers.update({
         "Content-Type": "application/x-www-form-urlencoded",
-    }
+    })
     client = get_client()
     res = await client.request(
         method="POST",
@@ -628,10 +625,10 @@ class LoginCheck:
         Returns:
             Credential: 凭据类
         """
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+        headers = HEADERS.copy()
+        headers.update({
             "Referer": self.__url,
-        }
+        })
         if self.__captcha_key is None:
             raise LoginError("尚未发送验证码。")
         if self.__id:

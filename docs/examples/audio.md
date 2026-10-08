@@ -1,7 +1,7 @@
 # 示例：下载指定歌单所有歌曲
 
 ```python
-from bilibili_api import audio, sync, get_session
+from bilibili_api import audio, sync, get_session, HEADERS
 import os
 from curl_cffi import requests
 
@@ -43,10 +43,7 @@ async def main():
         print(f"下载 {au['title']}")
         resp: requests.Response = await sess.get(
             url,
-            headers={
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-                "Referer": "https://www.bilibili.com/",
-            },
+            headers=HEADERS.copy(),
             stream=True,
         )
         with open(file, "wb") as f:

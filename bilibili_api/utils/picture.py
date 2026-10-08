@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from yarl import URL
 from PIL import Image
 
-from .network import Credential, get_client, BiliAPIFile
+from .network import Credential, get_client, BiliAPIFile, HEADERS
 
 
 @dataclass
@@ -72,13 +72,14 @@ class Picture:
             url = "https:" + url
         obj = Picture()
         session = get_client()
+        headers = HEADERS.copy()
+        headers.update({
+            "Referer": url,
+        })
         resp = await session.request(
             method="GET",
             url=url,
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.1938.54",
-                "Referer": url,
-            },
+            headers=headers,
         )
         obj.content = resp.raw
         obj.url = url

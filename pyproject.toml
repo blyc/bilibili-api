@@ -6,7 +6,7 @@ build-backend = "uv_build"
 name = "bilibili-api-python"
 authors = [{ name = "blyc"}]
 maintainers = [{ name = "MoyuScript" }, { name = "Nemo2011" }]
-version = "17.4.3"
+version = "17.4.4"
 readme = "README.md"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]

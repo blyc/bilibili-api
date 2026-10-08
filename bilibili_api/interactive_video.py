@@ -651,13 +651,13 @@ class InteractiveVideo(Video):
         credential = self.credential if self.credential else Credential()
         api = API["operate"]["savestory"]
         form_data = {"preview": "0", "data": story_tree, "csrf": credential.bili_jct}
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+        headers = HEADERS.copy()
+        headers.update({
             "Referer": "https://member.bilibili.com",
             "Content-Encoding": "gzip, deflate, br",
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "application/json, text/plain, */*",
-        }
+        })
         data = parse.urlencode(form_data)
         return (
             await Api(**api, credential=credential, no_csrf=True)
