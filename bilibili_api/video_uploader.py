@@ -24,7 +24,7 @@ from .utils.picture import Picture
 from .utils.AsyncEvent import AsyncEvent
 from .utils.aid_bvid_transformer import bvid2aid
 from .exceptions.ApiException import ApiException
-from .utils.network import Api, get_client, Credential, request_settings
+from .utils.network import Api, get_client, Credential, request_settings, HEADERS
 from .exceptions.NetworkException import NetworkException
 from .exceptions.ResponseCodeException import ResponseCodeException
 
@@ -774,6 +774,7 @@ class VideoUploader(AsyncEvent):
         # 首先获取视频文件预检信息
         session = get_client()
 
+        headers = HEADERS.copy()
         resp = await session.request(
             method="GET",
             url=api["url"],
@@ -789,10 +790,7 @@ class VideoUploader(AsyncEvent):
                 "probe_version": self.line["probe_version"],
             },
             cookies=await self.credential.get_buvid_cookies(),
-            headers={
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-                "Referer": "https://www.bilibili.com",
-            },
+            headers=headers,
         )
         if resp.code >= 400:
             self.dispatch(VideoUploaderEvents.PREUPLOAD_FAILED.value, {"page": page})
@@ -808,14 +806,14 @@ class VideoUploader(AsyncEvent):
         url = self._get_upload_url(preupload)
 
         # 获取 upload_id
+        headers = HEADERS.copy()
+        headers.update({
+            "x-upos-auth": preupload["auth"],
+        })
         resp = await session.request(
             method="POST",
             url=url,
-            headers={
-                "x-upos-auth": preupload["auth"],
-                "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-                "referer": "https://www.bilibili.com",
-            },
+            headers=headers,
             params={
                 "uploads": "",
                 "output": "json",
@@ -866,6 +864,7 @@ class VideoUploader(AsyncEvent):
         # })
 
         # # 预检元数据上传
+        # headers = HEADERS.copy()
         # async with session.get(api["url"], params={
         #     "name": "BUploader_meta.txt",
         #     "size": len(meta_to_upload),
@@ -875,10 +874,7 @@ class VideoUploader(AsyncEvent):
         #     "version": "2.10.3",
         #     "build": "2100300",
         # }, cookies=self.credential.get_cookies(),
-        #     headers={
-        #         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-        #         "Referer": "https://www.bilibili.com"
-        #     }, proxy=settings.proxy
+        #     headers=headers, proxy=settings.proxy
         # ) as resp:
         #     if resp.status >= 400:
         #         self.dispatch(VideoUploaderEvents.PREUPLOAD_FAILED.value, {page: page})
@@ -1493,11 +1489,11 @@ class VideoEditor(AsyncEvent):
         self.dispatch(VideoEditorEvents.PRE_SUBMIT.value)
         try:
             params = {"csrf": self.credential.bili_jct, "t": int(time.time())}
-            headers = {
+            headers = HEADERS.copy()
+            headers.update({
                 "content-type": "application/json;charset=UTF-8",
                 "referer": "https://member.bilibili.com",
-                "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-            }
+            })
             resp = (
                 await Api(
                     **api, credential=self.credential, no_csrf=True, json_body=True
